@@ -9,7 +9,7 @@ Fast wc -l implementation. I made it for fun, this program ain't going to replac
 make -j8 # to use 8 cores/threads in parallel compile
 sudo make install
 ```
-Now to run the program type `grepc` or if you want to use it from a pipe `cat * | grepc -p` .
+Now to run the program type `grepc` or if you want to use it from a pipe `ls | grepc -l` .
 
 ---
 
