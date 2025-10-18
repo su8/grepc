@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
       for (const auto &entry : fs::directory_iterator(argc == 1 ? "./" : ((argv[1][1] == 'b') ? "./" : argv[1]))) {
         if (argc > 1 && argv[1][1] == 'b') {
           std::string pathStr = entry.path().filename().string();
-          if (std::filesystem::exists(pathStr) && std::filesystem::is_directory(pathStr)) { continue; }
-          std::cout << pathStr << " " << std::filesystem::file_size(pathStr) << " bytes " << '\n' << std::flush;
+          if (fs::exists(pathStr) && fs::is_directory(pathStr)) { continue; }
+          std::cout << pathStr << " " << fs::file_size(pathStr) << " bytes " << '\n' << std::flush;
         }
         COUNT++;
       }
