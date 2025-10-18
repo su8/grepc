@@ -19,6 +19,7 @@ MA 02110-1301, USA.
 #include <cstdlib>
 #include <string>
 #include <filesystem>
+#include <csignal>
 
 static volatile sig_atomic_t COUNT = 0;
 namespace fs = std::filesystem;
