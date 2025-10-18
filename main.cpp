@@ -30,9 +30,8 @@ int main(int argc, char *argv[]) {
   std::string line;
   static_cast<void>(argv);
 
-  if (argc > 1) {
+  if (argc > 1 && argv[1][1] == 'l') {
     while (!feof(stdin)) {
-      //std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       std::getline(std::cin, line);
       COUNT++;
       gotPipe = 1U;
@@ -42,7 +41,11 @@ int main(int argc, char *argv[]) {
   if (gotPipe == 0U) {
     try {
       for (const auto &entry : fs::directory_iterator("./")) {
-        //std::cout << entry.path().filename().string() << '\n' << std::flush;
+        if (argc > 1 && argv[1][1] == 'b') {
+          std::string pathStr = entry.path().filename().string();
+          if (std::filesystem::exists(pathStr) && std::filesystem::is_directory(pathStr)) { continue; }
+          std::cout << pathStr << " " << std::filesystem::file_size(pathStr) << " bytes " << '\n' << std::flush;
+        }
         COUNT++;
       }
     } catch (const fs::filesystem_error& e) {
