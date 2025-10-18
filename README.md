@@ -1,4 +1,4 @@
-# grepc
+# grepc [![C/C++ CI](https://github.com/su8/grepc/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/su8/grepc/actions/workflows/c-cpp.yml)
 Fast wc -l implementation. I made it for fun, this program ain't going to replace ordinary `wc -l`.
 
 # Compile
