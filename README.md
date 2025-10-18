@@ -1,7 +1,7 @@
 ![](grepc.png) Run the commands one after another in `/usr/bin`.
 
 # grepc [![C/C++ CI](https://github.com/su8/grepc/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/su8/grepc/actions/workflows/c-cpp.yml)
-Fast wc -l implementation. I made it for fun, this program ain't going to replace ordinary `wc -l`.
+Faster **wc** implementation program. I made it for fun, this program ain't going to replace ordinary `wc` anytime soon.
 
 # Compile
 
@@ -10,6 +10,16 @@ make -j8 # to use 8 cores/threads in parallel compile
 sudo make install
 ```
 Now to run the program type `grepc` or if you want to use it from a pipe `ls | grepc -l` .
+
+---
+
+## Program options
+
+`-b` prints the total bytes for given file in a row
+
+`-l` prints total number of given stdin input, e.g. feeded by other programs in a pipe
+
+### If no options are provided before you execute the program it will list the total number of files and folders in current/or provided folder
 
 ---
 
@@ -75,14 +85,6 @@ In [Visual Studio Code Editor](https://code.visualstudio.com/download), go to **
 Optioanlly if you want to play around with the code from VSCode's console -- press `CTRL + SHIFT + B` wait until it compiles, after that press **CTRL** + **\`** and paste this `cp -r C:\Users\YOUR_USERNAME_GOES_HERE\Desktop\main.exe C:\MingW\bin;cd C:\MingW\bin;.\main.exe`
 
 ---
-
-## Program options
-
-`-b` prints all bytes for given file and number of total files
-
-`-l` prints total number of given stdin input feeded by other programs in a pipe
-
-### If no options are provided before you execute the program it will list the total number of files and folders
 
 ## Uninstall
 
