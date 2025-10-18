@@ -27,16 +27,14 @@ namespace fs = std::filesystem;
 
 int main(void) {
   unsigned short int gotPipe = 0U;
-  //std::string line;
+  std::string line;
 
-  /*while (1) {
+  while (feof(stdin)) {
     //std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    if (!std::getline(std::cin, line)) {
-      break;
-    }
+    std::getline(std::cin, line);
     COUNT++;
     gotPipe = 1U;
-  }*/
+  }
 
   if (gotPipe == 0U) {
     try {
