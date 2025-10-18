@@ -15,6 +15,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
+#include <cstdio>
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -25,14 +26,28 @@ static volatile sig_atomic_t COUNT = 0;
 namespace fs = std::filesystem;
 
 int main(void) {
-  try {
-    for (const auto &entry : fs::directory_iterator("./")) {
-      //std::cout << entry.path().filename().string() << '\n' << std::flush;
-      COUNT++;
+  unsigned short int gotPipe = 0U;
+  //std::string line;
+
+  /*while (1) {
+    //std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    if (!std::getline(std::cin, line)) {
+      break;
     }
-  } catch (const fs::filesystem_error& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
-    return EXIT_FAILURE;
+    COUNT++;
+    gotPipe = 1U;
+  }*/
+
+  if (gotPipe == 0U) {
+    try {
+      for (const auto &entry : fs::directory_iterator("./")) {
+        //std::cout << entry.path().filename().string() << '\n' << std::flush;
+        COUNT++;
+      }
+    } catch (const fs::filesystem_error& e) {
+      std::cerr << "Error: " << e.what() << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
   std::cout << COUNT << " items" << '\n' << std::flush;
