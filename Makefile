@@ -1,4 +1,4 @@
-#   10/18/2025 https://github.com/su8/0verknigh7
+#   10/18/2025 https://github.com/su8/grepc
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation; either version 2 of the License, or
