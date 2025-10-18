@@ -25,16 +25,19 @@ MA 02110-1301, USA.
 static volatile sig_atomic_t COUNT = 0;
 namespace fs = std::filesystem;
 
-int main(void) {
+int main(int argc, char *argv[]) {
   unsigned short int gotPipe = 0U;
-  //std::string line;
+  std::string line;
+  static_cast<void>(argv);
 
-  /*while (feof(stdin)) {
-    //std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::getline(std::cin, line);
-    COUNT++;
-    gotPipe = 1U;
-  }*/
+  if (argc > 1) {
+    while (!feof(stdin)) {
+      //std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::getline(std::cin, line);
+      COUNT++;
+      gotPipe = 1U;
+    }
+  }
 
   if (gotPipe == 0U) {
     try {
