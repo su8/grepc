@@ -76,6 +76,14 @@ Optioanlly if you want to play around with the code from VSCode's console -- pre
 
 ---
 
+## Program options
+
+`-b` prints all bytes for given file and number of total files
+
+`-l` prints total number of given stdin input feeded by other programs
+
+### If no options are provided before you execute the program it will list the total number of files and folders
+
 ## Uninstall
 
 ```make
