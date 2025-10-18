@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
   if (gotPipe == 0U) {
     try {
-      for (const auto &entry : fs::directory_iterator("./")) {
+      for (const auto &entry : fs::directory_iterator(argc == 1 ? "./" : ((argv[1][1] == 'b') ? "./" : argv[1]))) {
         if (argc > 1 && argv[1][1] == 'b') {
           std::string pathStr = entry.path().filename().string();
           if (std::filesystem::exists(pathStr) && std::filesystem::is_directory(pathStr)) { continue; }
