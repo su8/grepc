@@ -26,35 +26,29 @@ static volatile sig_atomic_t COUNT = 0;
 namespace fs = std::filesystem;
 
 int main(int argc, char *argv[]) {
-  unsigned short int gotPipe = 0U;
-  std::string line;
-
   if (argc > 1 && argv[1][1] == 'l') {
-    while (!feof(stdin)) {
-      std::getline(std::cin, line);
-      COUNT++;
-      gotPipe = 1U;
-    }
+    std::string line;
+    while (!feof(stdin)) { std::getline(std::cin, line); COUNT++; }
+    goto out;
   }
 
-  if (gotPipe == 0U) {
-    try {
-      std::string dirToTraverse = (argc == 1 ? "./" : (argc > 2 ? argv[2] : ((argv[1][1] == 'b') ? "./" : argv[1])));
-      for (const auto &entry : fs::directory_iterator(dirToTraverse)) {
-        if (argc > 1 && argv[1][1] == 'b') {
-          if (argc > 2) { std::filesystem::current_path(argv[2]); }
-          std::string pathStr = entry.path().filename().string();
-          if (fs::exists(pathStr) && fs::is_directory(pathStr)) { continue; }
-          std::cout << pathStr << " " << fs::file_size(pathStr) << " bytes " << '\n' << std::flush;
-        }
-        COUNT++;
+  try {
+    std::string dirToTraverse = (argc == 1 ? "./" : (argc > 2 ? argv[2] : ((argv[1][1] == 'b') ? "./" : argv[1])));
+    for (const auto &entry : fs::directory_iterator(dirToTraverse)) {
+      if (argc > 1 && argv[1][1] == 'b') {
+        if (argc > 2) { std::filesystem::current_path(argv[2]); }
+        std::string pathStr = entry.path().filename().string();
+        if (fs::exists(pathStr) && fs::is_directory(pathStr)) { continue; }
+        std::cout << pathStr << " " << fs::file_size(pathStr) << " bytes " << '\n' << std::flush;
       }
-    } catch (const fs::filesystem_error &e) {
+      COUNT++;
+    }
+  } catch (const fs::filesystem_error &e) {
       std::cerr << "Error: " << e.what() << std::endl;
       return EXIT_FAILURE;
-    }
   }
 
+out:
   std::cout << COUNT << " items" << '\n' << std::flush;
   return EXIT_SUCCESS;
 }
