@@ -28,7 +28,6 @@ namespace fs = std::filesystem;
 int main(int argc, char *argv[]) {
   unsigned short int gotPipe = 0U;
   std::string line;
-  static_cast<void>(argv);
 
   if (argc > 1 && argv[1][1] == 'l') {
     while (!feof(stdin)) {
