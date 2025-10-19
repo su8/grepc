@@ -43,10 +43,7 @@ int main(int argc, char *argv[]) {
       }
       COUNT++;
     }
-  } catch (const fs::filesystem_error &e) {
-      std::cerr << "Error: " << e.what() << std::endl;
-      return EXIT_FAILURE;
-  }
+  } catch (const fs::filesystem_error &e) { std::cerr << "Error: " << e.what() << std::endl; return EXIT_FAILURE; }
 
 out:
   std::cout << COUNT << " items" << '\n' << std::flush;
