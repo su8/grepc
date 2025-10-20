@@ -35,23 +35,17 @@ std::mutex outMutex;
 static std::unordered_map<std::string, uintmax_t> curDirNum;
 
 int main(int argc, char *argv[]) {
-  if (argc > 1 && argv[1][1] == 'l') {
-    std::string line;
-    while (!feof(stdin)) { std::getline(std::cin, line); COUNT++; }
-    goto out;
-  }
   if (argc > 1 && (argv[1][1] == 'm' || argv[1][1] == 'b')) {
     std::vector<std::thread> threads;
     for (int x = 2; x <= argc - 1; x++) { threads.emplace_back(walkMultiDirs, argv[x], argv[1][1]); curDirNum.emplace(argv[x], 0U); }
     for (auto &thread : threads) { if (thread.joinable()) { thread.join(); } }
     return EXIT_SUCCESS;
   }
-  try {
-    for (const auto &entry : fs::directory_iterator((argc == 1 ? "./" : argv[1]))) { static_cast<void>(entry); COUNT++; }
-  } catch (const fs::filesystem_error &e) { std::cerr << "Error: " << e.what() << std::endl; return EXIT_FAILURE; }
-
-out:
-  std::cout << COUNT << " items" << '\n' << std::flush;
+  if (argc > 1 && argv[1][1] == 'l') {
+    std::string line;
+    while (!feof(stdin)) { std::getline(std::cin, line); COUNT++; }
+    std::cout << COUNT << " items" << '\n' << std::flush;
+  }
   return EXIT_SUCCESS;
 }
 
