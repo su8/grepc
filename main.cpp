@@ -48,7 +48,6 @@ int main(int argc, char *argv[]) {
   try {
     std::string dirToTraverse = (argc == 1 ? "./" : (argc > 2 ? argv[2] : ((argv[1][1] == 'b') ? "./" : argv[1])));
     for (const auto &entry : fs::directory_iterator(dirToTraverse)) {
-      std::lock_guard<std::mutex> lock(outMutex);
       if (argc > 1 && argv[1][1] == 'b') {
         if (argc > 2) { std::filesystem::current_path(argv[2]); }
         std::string pathStr = entry.path().filename().string();
@@ -57,7 +56,7 @@ int main(int argc, char *argv[]) {
       }
       COUNT++;
     }
-  } catch (const fs::filesystem_error &e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; return EXIT_FAILURE; }
+  } catch (const fs::filesystem_error &e) { std::cerr << "Error: " << e.what() << std::endl; return EXIT_FAILURE; }
 
 out:
   std::cout << COUNT << " items" << '\n' << std::flush;
@@ -68,6 +67,7 @@ static void walkMultiDirs(char *folder) {
   try {
     for (const auto &entry : fs::directory_iterator(folder)) {
       std::lock_guard<std::mutex> lock(outMutex);
+      static_cast<void>(entry);
       std::filesystem::current_path(folder);
       curDirNum[folder]++;
     }
