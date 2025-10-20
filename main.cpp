@@ -45,7 +45,6 @@ int main(int argc, char *argv[]) {
     for (auto &thread : threads) { if (thread.joinable()) { thread.join(); } }
     return EXIT_SUCCESS;
   }
-
   try {
     std::string dirToTraverse = (argc == 1 ? "./" : (argc > 2 ? argv[2] : ((argv[1][1] == 'b') ? "./" : argv[1])));
     for (const auto &entry : fs::directory_iterator(dirToTraverse)) {
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]) {
       }
       COUNT++;
     }
-  } catch (const fs::filesystem_error& e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; }
+  } catch (const fs::filesystem_error &e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; return EXIT_FAILURE; }
 
 out:
   std::cout << COUNT << " items" << '\n' << std::flush;
@@ -73,5 +72,5 @@ static void walkMultiDirs(char *folder) {
       curDirNum[folder]++;
     }
     std::cout << folder << ' ' << curDirNum[folder] << " items" << '\n' << std::flush;
-  } catch (const fs::filesystem_error& e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; }
+  } catch (const fs::filesystem_error &e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; }
 }
