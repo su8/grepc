@@ -25,10 +25,11 @@ MA 02110-1301, USA.
 #include <mutex>
 #include <vector>
 #include <unordered_map>
+#include <inttypes.h>
 
-static void walkMultiDirs(char *folder);
+static void walkMultiDirs(const char *folder, char ch);
 
-static volatile sig_atomic_t COUNT = 0;
+static uintmax_t COUNT = 0U;
 namespace fs = std::filesystem;
 std::mutex outMutex;
 static std::unordered_map<std::string, uintmax_t> curDirNum;
@@ -39,23 +40,14 @@ int main(int argc, char *argv[]) {
     while (!feof(stdin)) { std::getline(std::cin, line); COUNT++; }
     goto out;
   }
-  if (argc > 1 && argv[1][1] == 'm') {
+  if (argc > 1 && (argv[1][1] == 'm' || argv[1][1] == 'b')) {
     std::vector<std::thread> threads;
-    for (int x = 2; x <= argc - 1; x++) { threads.emplace_back(walkMultiDirs, argv[x]); curDirNum.emplace(argv[x], 0); }
+    for (int x = 2; x <= argc - 1; x++) { threads.emplace_back(walkMultiDirs, argv[x], argv[1][1]); curDirNum.emplace(argv[x], 0U); }
     for (auto &thread : threads) { if (thread.joinable()) { thread.join(); } }
     return EXIT_SUCCESS;
   }
   try {
-    std::string dirToTraverse = (argc == 1 ? "./" : (argc > 2 ? argv[2] : ((argv[1][1] == 'b') ? "./" : argv[1])));
-    for (const auto &entry : fs::directory_iterator(dirToTraverse)) {
-      if (argc > 1 && argv[1][1] == 'b') {
-        if (argc > 2) { std::filesystem::current_path(argv[2]); }
-        std::string pathStr = entry.path().filename().string();
-        if (fs::exists(pathStr) && fs::is_directory(pathStr)) { continue; }
-        std::cout << pathStr << " " << fs::file_size(pathStr) << " bytes " << '\n' << std::flush;
-      }
-      COUNT++;
-    }
+    for (const auto &entry : fs::directory_iterator((argc == 1 ? "./" : argv[1]))) { static_cast<void>(entry); COUNT++; }
   } catch (const fs::filesystem_error &e) { std::cerr << "Error: " << e.what() << std::endl; return EXIT_FAILURE; }
 
 out:
@@ -63,12 +55,16 @@ out:
   return EXIT_SUCCESS;
 }
 
-static void walkMultiDirs(char *folder) {
+static void walkMultiDirs(const char *folder, char ch) {
   try {
     for (const auto &entry : fs::directory_iterator(folder)) {
       std::lock_guard<std::mutex> lock(outMutex);
-      static_cast<void>(entry);
       std::filesystem::current_path(folder);
+      if (ch == 'b') {
+        std::string pathStr = entry.path().filename().string();
+        if (fs::exists(pathStr) && fs::is_directory(pathStr)) { continue; }
+        std::cout << pathStr << " " << fs::file_size(pathStr) << " bytes " << '\n' << std::flush;
+      }
       curDirNum[folder]++;
     }
     std::cout << folder << ' ' << curDirNum[folder] << " items" << '\n' << std::flush;
