@@ -17,7 +17,9 @@ Now to run the program type `grepc` or if you want to use it from a pipe `ls | g
 
 `-b` prints the total bytes for given file in a row and you can specify folder to traverse right after the `-b` option
 
-`-l` prints counts the total input given from `stdin` input, e.g. feeded by other programs in a pipe
+`-l` prints count the total input given from `stdin` input, e.g. feeded by other programs in a pipe
+
+`-m` prints the total number of files and folders for each given folder right after the **-m** option
 
 ### If no options are provided the program will list the total number of files and folders in current/or provided folder
 
