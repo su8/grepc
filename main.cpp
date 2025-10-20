@@ -21,9 +21,17 @@ MA 02110-1301, USA.
 #include <string>
 #include <filesystem>
 #include <csignal>
+#include <thread>
+#include <mutex>
+#include <vector>
+#include <unordered_map>
+
+static void walkMultiDirs(char *folder);
 
 static volatile sig_atomic_t COUNT = 0;
 namespace fs = std::filesystem;
+std::mutex outMutex;
+static std::unordered_map<std::string, uintmax_t> curDirNum;
 
 int main(int argc, char *argv[]) {
   if (argc > 1 && argv[1][1] == 'l') {
@@ -31,10 +39,17 @@ int main(int argc, char *argv[]) {
     while (!feof(stdin)) { std::getline(std::cin, line); COUNT++; }
     goto out;
   }
+  if (argc > 1 && argv[1][1] == 'm') {
+    std::vector<std::thread> threads;
+    for (int x = 2; x <= argc - 1; x++) { threads.emplace_back(walkMultiDirs, argv[x]); curDirNum.emplace(argv[x], 0); }
+    for (auto &thread : threads) { if (thread.joinable()) { thread.join(); } }
+    return EXIT_SUCCESS;
+  }
 
   try {
     std::string dirToTraverse = (argc == 1 ? "./" : (argc > 2 ? argv[2] : ((argv[1][1] == 'b') ? "./" : argv[1])));
     for (const auto &entry : fs::directory_iterator(dirToTraverse)) {
+      std::lock_guard<std::mutex> lock(outMutex);
       if (argc > 1 && argv[1][1] == 'b') {
         if (argc > 2) { std::filesystem::current_path(argv[2]); }
         std::string pathStr = entry.path().filename().string();
@@ -43,9 +58,20 @@ int main(int argc, char *argv[]) {
       }
       COUNT++;
     }
-  } catch (const fs::filesystem_error &e) { std::cerr << "Error: " << e.what() << std::endl; return EXIT_FAILURE; }
+  } catch (const fs::filesystem_error& e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; }
 
 out:
   std::cout << COUNT << " items" << '\n' << std::flush;
   return EXIT_SUCCESS;
+}
+
+static void walkMultiDirs(char *folder) {
+  try {
+    for (const auto &entry : fs::directory_iterator(folder)) {
+      std::lock_guard<std::mutex> lock(outMutex);
+      std::filesystem::current_path(folder);
+      curDirNum[folder]++;
+    }
+    std::cout << folder << ' ' << curDirNum[folder] << " items" << '\n' << std::flush;
+  } catch (const fs::filesystem_error& e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; }
 }
