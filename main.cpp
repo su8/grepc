@@ -46,8 +46,11 @@ int main(int argc, char *argv[]) {
     while (!feof(stdin)) { std::getline(std::cin, line); count++; }
     std::cout << count << " items" << '\n' << std::flush;
   }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
   return EXIT_SUCCESS;
 }
+#pragma GCC diagnostic pop
 
 static void walkMultipleDirs(const char *folder, const char opt) {
   try {
