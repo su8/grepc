@@ -58,9 +58,9 @@ static void walkMultipleDirs(const char *folder, const char opt) {
       std::lock_guard<std::mutex> lock(mtx);
       fs::current_path(folder);
       if (opt == 'b') {
-        std::string pathStr = entry.path().filename().string();
-        if (fs::exists(pathStr) && fs::is_directory(pathStr)) { continue; }
-        std::cout << pathStr << " " << fs::file_size(pathStr) << " bytes " << '\n' << std::flush;
+        std::string fileStr = entry.path().filename().string();
+        if (fs::exists(fileStr) && fs::is_directory(fileStr)) { continue; }
+        std::cout << fileStr << " " << fs::file_size(fileStr) << " bytes " << '\n' << std::flush;
       }
       curDirNum[folder]++;
     }
