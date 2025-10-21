@@ -16,16 +16,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 #include <cstdio>
-#include <iostream>
+#include <csignal>
 #include <cstdlib>
+#include <inttypes.h>
+#include <iostream>
 #include <string>
 #include <filesystem>
-#include <csignal>
 #include <thread>
 #include <mutex>
 #include <vector>
 #include <unordered_map>
-#include <inttypes.h>
 
 static void walkMultipleDirs(const char *folder, const char opt);
 
@@ -61,6 +61,7 @@ static void walkMultipleDirs(const char *folder, const char opt) {
       }
       curDirNum[folder]++;
     }
-    std::cout << folder << ' ' << curDirNum[folder] << " items" << '\n' << std::flush;
+    fs::path curFolder = (folder[0] == '.') ? std::filesystem::current_path() : static_cast<fs::path>(folder);
+    std::cout << curFolder.string().c_str() << ' ' << curDirNum[folder] << " items" << '\n' << std::flush;
   } catch (const fs::filesystem_error &e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; }
 }
