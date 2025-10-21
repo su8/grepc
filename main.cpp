@@ -30,7 +30,7 @@ MA 02110-1301, USA.
 static void walkMultipleDirs(const char *folder, const char opt);
 
 namespace fs = std::filesystem;
-std::mutex outMutex;
+std::mutex mtx;
 static std::unordered_map<std::string, uintmax_t> curDirNum;
 
 int main(int argc, char *argv[]) {
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 static void walkMultipleDirs(const char *folder, const char opt) {
   try {
     for (const auto &entry : fs::directory_iterator(folder)) {
-      std::lock_guard<std::mutex> lock(outMutex);
+      std::lock_guard<std::mutex> lock(mtx);
       fs::current_path(folder);
       if (opt == 'b') {
         std::string pathStr = entry.path().filename().string();
@@ -66,5 +66,5 @@ static void walkMultipleDirs(const char *folder, const char opt) {
     }
     fs::path curFolder = (folder[0] == '.') ? fs::current_path() : static_cast<fs::path>(folder);
     std::cout << curFolder.string().c_str() << ' ' << curDirNum[folder] << " items" << '\n' << std::flush;
-  } catch (const fs::filesystem_error &e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; }
+  } catch (const fs::filesystem_error &e) { std::lock_guard<std::mutex> lock(mtx); std::cerr << "Error: " << e.what() << std::endl; }
 }
