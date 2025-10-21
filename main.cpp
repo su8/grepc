@@ -27,9 +27,8 @@ MA 02110-1301, USA.
 #include <unordered_map>
 #include <inttypes.h>
 
-static void walkMultiDirs(const char *folder, char ch);
+static void walkMultipleDirs(const char *folder, const char opt);
 
-static uintmax_t COUNT = 0U;
 namespace fs = std::filesystem;
 std::mutex outMutex;
 static std::unordered_map<std::string, uintmax_t> curDirNum;
@@ -37,24 +36,25 @@ static std::unordered_map<std::string, uintmax_t> curDirNum;
 int main(int argc, char *argv[]) {
   if (argc > 1 && (argv[1][1] == 'm' || argv[1][1] == 'b')) {
     std::vector<std::thread> threads;
-    for (int x = 2; x <= argc - 1; x++) { threads.emplace_back(walkMultiDirs, argv[x], argv[1][1]); curDirNum.emplace(argv[x], 0U); }
+    for (int x = 2; x <= argc - 1; x++) { threads.emplace_back(walkMultipleDirs, argv[x], argv[1][1]); curDirNum.emplace(argv[x], 0U); }
     for (auto &thread : threads) { if (thread.joinable()) { thread.join(); } }
     return EXIT_SUCCESS;
   }
   if (argc > 1 && argv[1][1] == 'l') {
     std::string line;
-    while (!feof(stdin)) { std::getline(std::cin, line); COUNT++; }
-    std::cout << COUNT << " items" << '\n' << std::flush;
+    uintmax_t count = 0U;
+    while (!feof(stdin)) { std::getline(std::cin, line); count++; }
+    std::cout << count << " items" << '\n' << std::flush;
   }
   return EXIT_SUCCESS;
 }
 
-static void walkMultiDirs(const char *folder, char ch) {
+static void walkMultipleDirs(const char *folder, const char opt) {
   try {
     for (const auto &entry : fs::directory_iterator(folder)) {
       std::lock_guard<std::mutex> lock(outMutex);
       std::filesystem::current_path(folder);
-      if (ch == 'b') {
+      if (opt == 'b') {
         std::string pathStr = entry.path().filename().string();
         if (fs::exists(pathStr) && fs::is_directory(pathStr)) { continue; }
         std::cout << pathStr << " " << fs::file_size(pathStr) << " bytes " << '\n' << std::flush;
