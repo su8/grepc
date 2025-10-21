@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 #include <cstdio>
 #include <csignal>
 #include <cstdlib>
-#include <inttypes.h>
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <filesystem>
