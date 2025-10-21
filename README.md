@@ -23,8 +23,6 @@ Now to run the program type `grepc` or if you want to use it from a pipe `ls | g
 
 `-l` prints count the total input given from `stdin` input, e.g. feeded by other programs in a pipe
 
-### If no options are provided the program will list the total number of files and folders in current/or provided folder
-
 ---
 
 ## Windows users
