@@ -53,7 +53,7 @@ static void walkMultipleDirs(const char *folder, const char opt) {
   try {
     for (const auto &entry : fs::directory_iterator(folder)) {
       std::lock_guard<std::mutex> lock(outMutex);
-      std::filesystem::current_path(folder);
+      fs::current_path(folder);
       if (opt == 'b') {
         std::string pathStr = entry.path().filename().string();
         if (fs::exists(pathStr) && fs::is_directory(pathStr)) { continue; }
@@ -61,7 +61,7 @@ static void walkMultipleDirs(const char *folder, const char opt) {
       }
       curDirNum[folder]++;
     }
-    fs::path curFolder = (folder[0] == '.') ? std::filesystem::current_path() : static_cast<fs::path>(folder);
+    fs::path curFolder = (folder[0] == '.') ? fs::current_path() : static_cast<fs::path>(folder);
     std::cout << curFolder.string().c_str() << ' ' << curDirNum[folder] << " items" << '\n' << std::flush;
   } catch (const fs::filesystem_error &e) { std::lock_guard<std::mutex> lock(outMutex); std::cerr << "Error: " << e.what() << std::endl; }
 }
