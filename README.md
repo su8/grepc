@@ -9,7 +9,7 @@ Faster **wc** implementation program. I made it for fun, this program ain't goin
 make -j8 # to use 8 cores/threads in parallel compile
 sudo make install
 ```
-Now to run the program type `grepc` or if you want to use it from a pipe `ls | grepc -l` .
+Now to run the program type `grepc -m .` or if you want to use it from a pipe `ls | grepc -l` .
 
 ---
 
