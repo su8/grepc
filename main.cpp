@@ -41,9 +41,8 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
   }
   if (argc > 1 && argv[1][1] == 'l') {
-    std::string line;
     uintmax_t count = 0U;
-    while (!feof(stdin)) { std::getline(std::cin, line); count++; }
+    for (std::string line; std::getline(std::cin, line); count++) { ; }
     std::cout << count << " items" << '\n' << std::flush;
   }
 #pragma GCC diagnostic push
