@@ -65,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
     completer->popup()->setStyleSheet("background-color:rgb(54, 57, 63); color:white;");
     ui->lineEdit->setClearButtonEnabled(true);
     connect(ui->lineEdit, &QLineEdit::returnPressed, this, &MainWindow::on_pushButton_clicked);
+    connect(ui->lineEdit, &QLineEdit::textChanged, this, &MainWindow::setText);
 }
 
 MainWindow::~MainWindow()
@@ -99,8 +100,6 @@ void MainWindow::on_pushButton_clicked()
     QString inputStr = ui->lineEdit->text();
     ui->textEdit->setText(inputStr + static_cast<QString>('\n') + oldText);
     ui->lineEdit->setText(static_cast<QString>(""));
-
-    //ui->textEdit->verticalScrollBar()->setValue(ui->textEdit->verticalScrollBarScrollBar()->maximum);
 }
 
 void MainWindow::setText() { ui->textEdit->setText(oldText); }
