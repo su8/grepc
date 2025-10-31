@@ -36,6 +36,7 @@
 #include <QPalette>
 #include <QAbstractItemView>
 #include <QString>
+#include <QTextEdit>
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
@@ -97,7 +98,13 @@ void MainWindow::on_pushButton_clicked()
     ui->lineEdit->setText(static_cast<QString>(""));
 }
 
-void MainWindow::setText() { ui->textEdit->setText(oldText); }
+void MainWindow::setText()
+{
+    ui->textEdit->setText(oldText);
+    QTextCursor cursor = ui->textEdit->textCursor();
+    cursor.movePosition(QTextCursor::End);
+    ui->textEdit->setTextCursor(cursor);
+}
 
 int main(int argc, char *argv[])
 {
