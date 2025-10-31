@@ -27,6 +27,7 @@
 #include <mutex>
 #include <vector>
 #include <unordered_map>
+#include <regex>
 
 #include <QApplication>
 #include <QCompleter>
@@ -80,21 +81,15 @@ void MainWindow::on_pushButton_clicked()
     std::string userInput = static_cast<std::string>(ui->lineEdit->text().toStdString());
     if (userInput.empty()) { return; }
 
-    unsigned short int z = 0U;
     unsigned short int y = 0U;
     char folders[256][4096] = {'\0'};
-    char buf[4096] = {'\0'};
-    char *bufptr = buf;
-    const char *allptr = userInput.c_str();
-    for(; *allptr; allptr++, z++) {
-        if (*allptr == '-' && (*(allptr+1) == 'b' || *(allptr+1) == 'm')) { allptr++; allptr++; continue; }
-        if (std::isspace(*allptr)) { y++; continue;}
-        *bufptr++ = *allptr;
-        snprintf(folders[y], sizeof(buf), "%s", buf);
-    }
+    std::regex wRegex("\\S+");
+    auto wBeg = std::sregex_iterator(userInput.begin(), userInput.end(), wRegex);
+    auto wEnd = std::sregex_iterator();
+    for (auto it = wBeg; it != wEnd; it++) { if (it->str() == "-m" || it->str() == "-b") { continue; } snprintf(folders[y++], 4096, "%s", it->str().c_str()); }
 
     std::vector<std::thread> threads;
-    for (int x = 0; x <= y; x++) { threads.emplace_back(walkMultipleDirs, folders[x], userInput.c_str()[1]); curDirNum.emplace(folders[x], 0U); }
+    for (int x = 0; x < y; x++) { threads.emplace_back(walkMultipleDirs, folders[x], userInput.c_str()[1]); curDirNum.emplace(folders[x], 0U); }
     for (auto &thread : threads) { if (thread.joinable()) { thread.join(); } }
 
     QString inputStr = ui->lineEdit->text();
