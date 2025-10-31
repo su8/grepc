@@ -9,7 +9,26 @@ Faster **wc** implementation program. I made it for fun, this program ain't goin
 make -j8 # to use 8 cores/threads in parallel compile
 sudo make install
 ```
+
 Now to run the program type `grepc -m .` or if you want to use it from a pipe `ls | grepc -l` .
+
+# Compile the GUI with:
+
+```bash
+mkdir -p build
+cp -r CMakeLists.txt mainwindow.h mainwindow.cpp mainwindow.ui build/
+cd build
+cmake .
+make -j8 # 8 cores/threads to use in parallel compile
+sudo make install
+sudo mv /usr/bin/main /usr/bin/grepcg
+
+# To start it
+grepcg
+```
+
+If on windows, you'll have to download the online [Qt installer](https://www.qt.io/cs/c/?cta_guid=074ddad0-fdef-4e53-8aa8-5e8a876d6ab4&signature=AAH58kEJJxpduKtfibJ40aRNSB4V5QaI1A&pageId=12602948080&placement_guid=99d9dd4f-5681-48d2-b096-470725510d34&click=559deaff-10e4-44a7-a78c-ef8b98f3c31a&hsutk=&canon=https%3A%2F%2Fwww.qt.io%2Fdownload-open-source&portal_id=149513&redirect_url=APefjpGq5H2gLEy0rkYfu04Stc7zjmm0KqS_XaAVoOUeI1pUOzGQZgD_zg87kf-KWNMA8LagnlFie8sOAzzTMW8z48C4QlIP08Ykoqpk2QaLznoki0aaOBah-YfMzg2wugOl_TcZQF2S) and install Qt 6 **manually** from the GUI installer. Don't go with the defaults, choose **manual** installation and scroll up to see the **multimedia** codec which you must select in order to compile hackzy GUI.
+
 
 ---
 
