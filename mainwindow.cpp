@@ -27,7 +27,6 @@
 #include <mutex>
 #include <vector>
 #include <unordered_map>
-#include <regex>
 
 #include <QApplication>
 #include <QCompleter>
@@ -84,12 +83,10 @@ void MainWindow::on_pushButton_clicked()
 
     unsigned short int y = 0U;
     char folders[256][4096] = {'\0'};
-    std::regex wRegex("\\S+");
-    auto wBeg = std::sregex_iterator(userInput.begin(), userInput.end(), wRegex);
-    auto wEnd = std::sregex_iterator();
-    for (auto it = wBeg; it != wEnd; it++) { if (it->str() == "-m" || it->str() == "-b") { continue; } snprintf(folders[y++], 4096, "%s", it->str().c_str()); }
-
+    char *allptr = userInput.data();
+    char *token;
     std::vector<std::thread> threads;
+    while ((token = strtok_r(allptr, " ", &allptr))) { if (!strcmp(token, "-m") || !strcmp(token, "-b")) { continue; } snprintf(folders[y++], 4096, "%s", token); }
     for (int x = 0; x < y; x++) { threads.emplace_back(walkMultipleDirs, folders[x], userInput.c_str()[1]); curDirNum.emplace(folders[x], 0U); }
     for (auto &thread : threads) { if (thread.joinable()) { thread.join(); } }
 
