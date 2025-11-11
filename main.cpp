@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #include <mutex>
 #include <vector>
 #include <unordered_map>
+#include <stdexcept>
 
 static void walkMultipleDirs(const char *folder, const char opt);
 
@@ -65,5 +66,5 @@ static void walkMultipleDirs(const char *folder, const char opt) {
     }
     fs::path curFolder = (folder[0] == '.') ? fs::current_path() : static_cast<fs::path>(folder);
     std::cout << curFolder.string() << ' ' << curDirNum[folder] << " items" << '\n' << std::flush;
-  } catch (const fs::filesystem_error &e) { std::lock_guard<std::mutex> lock(mtx); std::cerr << "Error: " << e.what() << std::endl; }
+  } catch (const std::exception &e) { std::lock_guard<std::mutex> lock(mtx); std::cerr << "Error: " << e.what() << std::endl; return; }
 }
