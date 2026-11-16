@@ -19,6 +19,7 @@ MA 02110-1301, USA.
 #include <csignal>
 #include <cstdlib>
 #include <cstdint>
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <filesystem>
@@ -28,7 +29,18 @@ MA 02110-1301, USA.
 #include <unordered_map>
 #include <stdexcept>
 
+#if defined(__x86_64__) || defined(__i386__)
+#define GREPC_X86 1
+#include <immintrin.h>
+#endif
+
 static void walkMultipleDirs(const char *folder, const char opt);
+static uintmax_t countLines(void);
+static uintmax_t countNewlinesScalar(const char *buf, size_t len);
+#ifdef GREPC_X86
+__attribute__((target("avx2")))
+static uintmax_t countNewlinesAVX2(const char *buf, size_t len);
+#endif
 
 namespace fs = std::filesystem;
 std::mutex mtx;
@@ -42,15 +54,70 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
   }
   if (argc > 1 && argv[1][1] == 'l') {
-    uintmax_t count = 0U;
-    for (std::string line; std::getline(std::cin, line); count++) { ; }
-    std::cout << count << " items" << '\n' << std::flush;
+    std::cout << countLines() << " items" << '\n' << std::flush;
   }
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-overflow"
   return EXIT_SUCCESS;
 }
 #pragma GCC diagnostic pop
+
+static uintmax_t countNewlinesScalar(const char *buf, size_t len) {
+  uintmax_t total = 0U;
+  for (size_t i = 0; i < len; i++) { total += (buf[i] == '\n'); }
+  return total;
+}
+
+#ifdef GREPC_X86
+__attribute__((target("avx2")))
+static uintmax_t countNewlinesAVX2(const char *buf, size_t len) {
+  const __m256i nl = _mm256_set1_epi8('\n');
+  const __m256i zero = _mm256_setzero_si256();
+  uintmax_t total = 0U;
+  size_t i = 0;
+
+  while (i + 32 <= len) {
+    /* 8-bit per-lane counters can hold at most 255 increments */
+    size_t blocks = (len - i) / 32;
+    if (blocks > 255) { blocks = 255; }
+    __m256i acc = zero;
+    for (size_t b = 0; b < blocks; b++, i += 32) {
+      __m256i v = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(buf + i));
+      /* cmpeq gives 0xFF (-1) on match, so subtracting adds 1 */
+      acc = _mm256_sub_epi8(acc, _mm256_cmpeq_epi8(v, nl));
+    }
+    /* horizontally sum the 32 byte counters into four 64-bit lanes */
+    __m256i sums = _mm256_sad_epu8(acc, zero);
+    alignas(32) uint64_t out[4];
+    _mm256_store_si256(reinterpret_cast<__m256i *>(out), sums);
+    total += out[0] + out[1] + out[2] + out[3];
+  }
+  for (; i < len; i++) { total += (buf[i] == '\n'); }
+  return total;
+}
+#endif
+
+static uintmax_t countLines(void) {
+  static char buf[1U << 20];
+  uintmax_t count = 0U;
+  char last = '\n';
+  size_t n;
+#ifdef GREPC_X86
+  const bool useAVX2 = __builtin_cpu_supports("avx2");
+#endif
+
+  while ((n = fread(buf, 1, sizeof(buf), stdin)) > 0) {
+#ifdef GREPC_X86
+    count += useAVX2 ? countNewlinesAVX2(buf, n) : countNewlinesScalar(buf, n);
+#else
+    count += countNewlinesScalar(buf, n);
+#endif
+    last = buf[n - 1];
+  }
+  /* same behaviour as std::getline: a final line without '\n' still counts */
+  if (last != '\n') { count++; }
+  return count;
+}
 
 static void walkMultipleDirs(const char *folder, const char opt) {
   try {
